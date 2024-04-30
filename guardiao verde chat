@@ -1,0 +1,35 @@
+import robocode.*;
+
+public class MeuRobo extends Robot {
+    boolean moveParaFrente = true;
+
+    public void run() {
+        while (true) {
+            if (moveParaFrente) {
+                andarParaFrente();
+            } else {
+                andarParaTras();
+            }
+            girar();
+            moveParaFrente = !moveParaFrente;
+        }
+    }
+
+    void andarParaFrente() {
+        setColors(java.awt.Color.BLACK, java.awt.Color.WHITE, java.awt.Color.BLACK); // Cor preto e branco
+        ahead(100); // Anda para frente 100 pixels
+    }
+
+    void andarParaTras() {
+        setColors(java.awt.Color.WHITE, java.awt.Color.BLACK, java.awt.Color.WHITE); // Cor branco e preto
+        back(100); // Anda para trás 100 pixels
+    }
+
+    void girar() {
+        turnRight(90); // Gira 90 graus para a direita
+    }
+
+    public void onScannedRobot(ScannedRobotEvent e) {
+        fire(1); // Atira no inimigo com potência 1
+    }
+}
