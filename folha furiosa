@@ -1,0 +1,97 @@
+import robocode.*;
+
+public class RoboVerde extends AdvancedRobot {
+
+    // Variáveis para controlar o movimento
+    private boolean movendoParaFrente = true;
+    private boolean virandoEsquerda = false;
+    private boolean virandoDireita = false;
+
+    // Variável para controlar o radar
+    private double alcanceRadar = 400;
+
+    // Variável para controlar o canhão
+    private double anguloCanhao = 0;
+
+    // Variável para controlar o tiro
+    private boolean atirando = false;
+
+    public void run() {
+        // Definir a cor do robô
+        setBodyColor(Color.GREEN);
+        setGunColor(Color.GREEN);
+
+        // Loop principal do robô
+        while (true) {
+            // Atualizar o radar
+            scan();
+
+            // Controlar o movimento
+            if (movendoParaFrente) {
+                setAhead(100);
+            } else if (virandoEsquerda) {
+                setTurnLeft(90);
+                virandoEsquerda = false;
+                virandoDireita = true;
+            } else if (virandoDireita) {
+                setTurnRight(90);
+                virandoDireita = false;
+                movendoParaFrente = true;
+            }
+
+            // Controlar o canhão
+            if (atirando) {
+                setFire(3);
+                atirando = false;
+            } else {
+                anguloCanhao += 3;
+                setTurnGunRight(anguloCanhao);
+            }
+
+            // Verificar se há um inimigo próximo
+            if (getRadarDistance() < alcanceRadar) {
+                // Virar o canhão para o inimigo
+                setTurnGunRight(getHeading() - getRadarHeading());
+
+                // Atirar no inimigo
+                atirando = true;
+            }
+
+            // Executar as ações pendentes
+            execute();
+
+            // Esperar um pouco antes de repetir o loop
+            yield();
+        }
+    }
+
+    // Evento chamado quando o robô bate em uma parede
+    public void onHitWall(HitWallEvent e) {
+        // Mudar a direção do movimento
+        if (movendoParaFrente) {
+            virandoEsquerda = true;
+            movendoParaFrente = false;
+        } else if (virandoEsquerda) {
+            virandoDireita = true;
+            virandoEsquerda = false;
+        } else if (virandoDireita) {
+            movendoParaFrente = true;
+            virandoDireita = false;
+        }
+    }
+
+    // Evento chamado quando o robô é atingido por um tiro
+    public void onHitByBullet(HitByBulletEvent e) {
+        // Mudar a direção do movimento
+        if (movendoParaFrente) {
+            virandoDireita = true;
+            movendoParaFrente = false;
+        } else if (virandoEsquerda) {
+            movendoParaFrente = true;
+            virandoEsquerda = false;
+        } else if (virandoDireita) {
+            virandoEsquerda = true;
+            virandoDireita = false;
+        }
+    }
+}
